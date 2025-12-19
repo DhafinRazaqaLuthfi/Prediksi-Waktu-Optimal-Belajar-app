@@ -102,8 +102,8 @@ durasi_hp = st.selectbox(
     ["< 2 jam", "2-4 jam", "4-6 jam", "> 6 jam"]
 )
 
-gangguan = st.slider("Tingkat Gangguan", 1, 5)
 coffee = st.selectbox("Konsumsi Kopi", ["Tidak", "Ya"])
+gangguan = st.slider("Tingkat Gangguan", 1, 5)
 mood = st.slider("Mood", 1, 5)
 produktivitas = st.slider("Produktivitas", 1, 5)
 
