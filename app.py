@@ -185,9 +185,6 @@ if st.button("🔮 Prediksi Waktu Optimal"):
         f"✅ **Waktu belajar paling optimal adalah:** {label_map[pred]}"
     )
 
-    # =====================
-    # CONFIDENCE
-    # =====================
     st.subheader("📊 Tingkat Keyakinan Model")
 
     confidence_labels = ["🌅 Pagi", "🌤️ Siang", "🌙 Malam"]
@@ -202,9 +199,10 @@ if st.button("🔮 Prediksi Waktu Optimal"):
         st.write(f"{probs[i]*100:.2f}%")
 
 # =====================
-# FOOTER - KELOMPOK
+# FOOTER (SELALU MUNCUL)
 # =====================
 st.divider()
+
 st.markdown(
     """
     <div style="text-align: center; font-size: 14px; color: gray;">
