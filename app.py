@@ -20,7 +20,7 @@ st.set_page_config(
 # =====================
 # HEADER ATAS (LOGO + INFO KELOMPOK)
 # =====================
-logo = Image.open("logo_itera.png")
+logo = Image.open("logo1.png")
 
 col1, col2 = st.columns([1, 5])
 
