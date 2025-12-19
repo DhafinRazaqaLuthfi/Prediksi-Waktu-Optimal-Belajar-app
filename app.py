@@ -75,10 +75,7 @@ scaler = joblib.load(SCALER_PATH)
 
 # JUDUL APLIKASI
 st.title("📊 Prediksi Waktu Optimal Belajar")
-st.write(
-    "Aplikasi ini menggunakan model Multilayer Perceptron (MLP)
-    untuk memprediksi waktu belajar paling optimal berdasarkan kebiasaan dan kondisi pengguna."
-)
+st.write("Aplikasi ini menggunakan model Multilayer Perceptron (MLP) untuk memprediksi waktu belajar paling optimal berdasarkan kebiasaan dan kondisi pengguna.")
 
 
 st.divider()
