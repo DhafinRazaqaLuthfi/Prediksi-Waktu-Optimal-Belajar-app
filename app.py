@@ -12,8 +12,20 @@ import torch
 import torch.nn as nn
 import numpy as np
 import joblib
+import os
 
-# MODEL MLP
+# =====================
+# KONFIGURASI HALAMAN
+# =====================
+st.set_page_config(
+    page_title="Prediksi Waktu Optimal Belajar",
+    page_icon="📚",
+    layout="centered"
+)
+
+# =====================
+# MODEL MLP (SAMA DENGAN TRAINING)
+# =====================
 class MLP(nn.Module):
     def __init__(self, input_dim):
         super().__init__()
@@ -30,72 +42,119 @@ class MLP(nn.Module):
     def forward(self, x):
         return self.fc(x)
 
+# =====================
 # LOAD MODEL & SCALER
+# =====================
+MODEL_PATH = "model.pth"
+SCALER_PATH = "scaler.pkl"
+
+if not os.path.exists(MODEL_PATH):
+    st.error("❌ File model.pth tidak ditemukan. Pastikan sudah di-upload ke GitHub.")
+    st.stop()
+
+if not os.path.exists(SCALER_PATH):
+    st.error("❌ File scaler.pkl tidak ditemukan. Pastikan sudah di-upload ke GitHub.")
+    st.stop()
+
 model = MLP(input_dim=9)
-model.load_state_dict(torch.load("model_mlp.pth", map_location=torch.device("cpu")))
+model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device("cpu")))
 model.eval()
 
-scaler = joblib.load("scaler.pkl")
+scaler = joblib.load(SCALER_PATH)
 
-# STREAMLIT UI
-st.title("Prediksi Waktu Optimal Belajar")
-st.write("Aplikasi Deep Learning (MLP)")
+# =====================
+# JUDUL APLIKASI
+# =====================
+st.title("📊 Prediksi Waktu Optimal Belajar")
+st.write("Aplikasi Deep Learning menggunakan **MLP (PyTorch)**")
 
-st.subheader("Input Data")
+st.divider()
+st.subheader("📝 Masukkan Data Kebiasaan Anda")
 
-jam_tidur = st.selectbox("Jam Tidur", [
-    "21.00-22.00", "22.01-23.00", "23.01-00.00", "00.01-01.00", "> 01.00"
-])
+# =====================
+# INPUT USER
+# =====================
+jam_tidur = st.selectbox(
+    "Jam Tidur",
+    ["21.00-22.00", "22.01-23.00", "23.01-00.00", "00.01-01.00", "> 01.00"]
+)
 
-durasi_tidur = st.selectbox("Durasi Tidur", [
-    "< 5 jam", "5-6 jam", "6-7 jam", "7-8 jam", "> 8 jam"
-])
+durasi_tidur = st.selectbox(
+    "Durasi Tidur",
+    ["< 5 jam", "5-6 jam", "6-7 jam", "7-8 jam", "> 8 jam"]
+)
 
-durasi_belajar = st.selectbox("Durasi Belajar", [
-    "< 1 jam", "1-2 jam", "2-3 jam", "3-4 jam", "> 4 jam"
-])
+durasi_belajar = st.selectbox(
+    "Durasi Belajar",
+    ["< 1 jam", "1-2 jam", "2-3 jam", "3-4 jam", "> 4 jam"]
+)
 
-jam_belajar = st.selectbox("Jam Belajar", [
-    "05.00-10.59", "11.00-16.59", "17.00-00.59"
-])
+jam_belajar = st.selectbox(
+    "Jam Belajar",
+    ["05.00-10.59", "11.00-16.59", "17.00-00.59"]
+)
 
 gangguan = st.slider("Tingkat Gangguan", 1, 5)
-durasi_hp = st.selectbox("Durasi HP/Laptop", [
-    "< 2 jam", "2-4 jam", "4-6 jam", "> 6 jam"
-])
+durasi_hp = st.selectbox(
+    "Durasi HP / Laptop",
+    ["< 2 jam", "2-4 jam", "4-6 jam", "> 6 jam"]
+)
 
 coffee = st.selectbox("Konsumsi Kopi", ["Tidak", "Ya"])
 mood = st.slider("Mood", 1, 5)
 produktivitas = st.slider("Produktivitas", 1, 5)
 
-# ENCODING
+# =====================
+# ENCODING (IDENTIK DENGAN TRAINING)
+# =====================
 encode_jam_tidur = {
-    "21.00-22.00": 0, "22.01-23.00": 1, "23.01-00.00": 2,
-    "00.01-01.00": 3, "> 01.00": 4
+    "21.00-22.00": 0,
+    "22.01-23.00": 1,
+    "23.01-00.00": 2,
+    "00.01-01.00": 3,
+    "> 01.00": 4
 }
 
 encode_durasi_tidur = {
-    "< 5 jam": 0, "5-6 jam": 1, "6-7 jam": 2,
-    "7-8 jam": 3, "> 8 jam": 4
+    "< 5 jam": 0,
+    "5-6 jam": 1,
+    "6-7 jam": 2,
+    "7-8 jam": 3,
+    "> 8 jam": 4
 }
 
 encode_durasi_belajar = {
-    "< 1 jam": 0, "1-2 jam": 1, "2-3 jam": 2,
-    "3-4 jam": 3, "> 4 jam": 4
+    "< 1 jam": 0,
+    "1-2 jam": 1,
+    "2-3 jam": 2,
+    "3-4 jam": 3,
+    "> 4 jam": 4
 }
 
 encode_jam_belajar = {
-    "05.00-10.59": 0, "11.00-16.59": 1, "17.00-00.59": 2
+    "05.00-10.59": 0,
+    "11.00-16.59": 1,
+    "17.00-00.59": 2
 }
 
 encode_hp = {
-    "< 2 jam": 0, "2-4 jam": 1, "4-6 jam": 2, "> 6 jam": 3
+    "< 2 jam": 0,
+    "2-4 jam": 1,
+    "4-6 jam": 2,
+    "> 6 jam": 3
 }
 
-encode_coffee = {"Tidak": 0, "Ya": 1}
+encode_coffee = {
+    "Tidak": 0,
+    "Ya": 1
+}
 
-# Prediksi
-if st.button("Prediksi"):
+# =====================
+# PREDIKSI
+# =====================
+st.divider()
+
+if st.button("🔮 Prediksi Waktu Optimal"):
     data = np.array([[
         encode_jam_tidur[jam_tidur],
         encode_durasi_tidur[durasi_tidur],
@@ -116,9 +175,9 @@ if st.button("Prediksi"):
         pred = torch.argmax(output, dim=1).item()
 
     label_map = {
-        0: "Pagi (05.00-10.59)",
-        1: "Siang (11.00-16.59)",
-        2: "Malam (17.00-00.59)"
+        0: "🌅 Pagi (05.00 - 10.59)",
+        1: "🌤️ Siang (11.00 - 16.59)",
+        2: "🌙 Malam (17.00 - 00.59)"
     }
 
-    st.success(f"Waktu optimal belajar Anda adalah: **{label_map[pred]}**")
+    st.success(f"✅ Waktu optimal belajar Anda adalah: **{label_map[pred]}**")
