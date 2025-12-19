@@ -8,18 +8,12 @@ import joblib
 import os
 from PIL import Image
 
-# =====================
-# KONFIGURASI HALAMAN (WAJIB PALING ATAS)
-# =====================
 st.set_page_config(
     page_title="Prediksi Waktu Optimal Belajar",
     page_icon="📊",
     layout="centered"
 )
 
-# =====================
-# HEADER ATAS (LOGO + INFO KELOMPOK)
-# =====================
 logo = Image.open("logo_itera.png")
 
 col1, col2 = st.columns([1, 5])
@@ -43,15 +37,11 @@ with col2:
 
 st.divider()
 
-# =====================
 # PATH FILE
-# =====================
 MODEL_PATH = "model.pth"
 SCALER_PATH = "scaler.pkl"
 
-# =====================
 # MODEL MLP
-# =====================
 class MLP(nn.Module):
     def __init__(self, input_dim):
         super().__init__()
@@ -68,9 +58,7 @@ class MLP(nn.Module):
     def forward(self, x):
         return self.fc(x)
 
-# =====================
 # LOAD MODEL & SCALER
-# =====================
 if not os.path.exists(MODEL_PATH):
     st.error("❌ File model.pth tidak ditemukan")
     st.stop()
@@ -85,18 +73,18 @@ model.eval()
 
 scaler = joblib.load(SCALER_PATH)
 
-# =====================
 # JUDUL APLIKASI
-# =====================
 st.title("📊 Prediksi Waktu Optimal Belajar")
-st.write("Aplikasi prediksi waktu belajar optimal berbasis **MLP (PyTorch)**")
+st.write(
+    "Aplikasi ini menggunakan model Multilayer Perceptron (MLP)
+    untuk memprediksi waktu belajar paling optimal berdasarkan kebiasaan dan kondisi pengguna."
+)
+
 
 st.divider()
 st.subheader("📝 Masukkan Data Kebiasaan Anda")
 
-# =====================
 # INPUT USER
-# =====================
 jam_tidur = st.selectbox(
     "Pada jam berapa Anda biasanya tidur?",
     ["21.00-22.00", "22.01-23.00", "23.01-00.00", "00.01-01.00", "> 01.00"]
@@ -131,9 +119,7 @@ gangguan = st.slider("Berapa banyak gangguan saat belajar?", 1, 5)
 mood = st.slider("Seberapa semangat Anda saat belajar?", 1, 5)
 produktivitas = st.slider("Seberapa produktif Anda saat belajar?", 1, 5)
 
-# =====================
 # ENCODING
-# =====================
 encode_jam_tidur = {
     "21.00-22.00": 0,
     "22.01-23.00": 1,
@@ -176,9 +162,7 @@ encode_coffee = {
     "Ya": 1
 }
 
-# =====================
 # PREDIKSI
-# =====================
 st.divider()
 
 if st.button("🔮 Prediksi Waktu Optimal"):
