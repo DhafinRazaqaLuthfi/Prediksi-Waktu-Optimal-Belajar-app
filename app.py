@@ -10,6 +10,7 @@ Original file is located at
 import streamlit as st
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import numpy as np
 import joblib
 import os
@@ -19,12 +20,19 @@ import os
 # =====================
 st.set_page_config(
     page_title="Prediksi Waktu Optimal Belajar",
-    page_icon="📚",
+    page_icon="📊",
     layout="centered"
 )
 
 # =====================
-# MODEL MLP (SAMA DENGAN TRAINING)
+# KONSTANTA MODEL
+# =====================
+MODEL_PATH = "model.pth"
+SCALER_PATH = "scaler.pkl"
+MODEL_ACCURACY = 76.92  # dari evaluasi test set
+
+# =====================
+# MODEL MLP
 # =====================
 class MLP(nn.Module):
     def __init__(self, input_dim):
@@ -45,15 +53,12 @@ class MLP(nn.Module):
 # =====================
 # LOAD MODEL & SCALER
 # =====================
-MODEL_PATH = "model.pth"
-SCALER_PATH = "scaler.pkl"
-
 if not os.path.exists(MODEL_PATH):
-    st.error("❌ File model.pth tidak ditemukan. Pastikan sudah di-upload ke GitHub.")
+    st.error("❌ File model.pth tidak ditemukan")
     st.stop()
 
 if not os.path.exists(SCALER_PATH):
-    st.error("❌ File scaler.pkl tidak ditemukan. Pastikan sudah di-upload ke GitHub.")
+    st.error("❌ File scaler.pkl tidak ditemukan")
     st.stop()
 
 model = MLP(input_dim=9)
@@ -63,10 +68,11 @@ model.eval()
 scaler = joblib.load(SCALER_PATH)
 
 # =====================
-# JUDUL APLIKASI
+# HEADER
 # =====================
 st.title("📊 Prediksi Waktu Optimal Belajar")
-st.write("Aplikasi Deep Learning menggunakan **MLP (PyTorch)**")
+st.write("Aplikasi **Deep Learning (MLP – PyTorch)**")
+st.info(f"📈 **Akurasi Model (Test Set): {MODEL_ACCURACY}%**")
 
 st.divider()
 st.subheader("📝 Masukkan Data Kebiasaan Anda")
@@ -105,49 +111,32 @@ mood = st.slider("Mood", 1, 5)
 produktivitas = st.slider("Produktivitas", 1, 5)
 
 # =====================
-# ENCODING (IDENTIK DENGAN TRAINING)
+# ENCODING
 # =====================
 encode_jam_tidur = {
-    "21.00-22.00": 0,
-    "22.01-23.00": 1,
-    "23.01-00.00": 2,
-    "00.01-01.00": 3,
-    "> 01.00": 4
+    "21.00-22.00": 0, "22.01-23.00": 1, "23.01-00.00": 2,
+    "00.01-01.00": 3, "> 01.00": 4
 }
 
 encode_durasi_tidur = {
-    "< 5 jam": 0,
-    "5-6 jam": 1,
-    "6-7 jam": 2,
-    "7-8 jam": 3,
-    "> 8 jam": 4
+    "< 5 jam": 0, "5-6 jam": 1, "6-7 jam": 2,
+    "7-8 jam": 3, "> 8 jam": 4
 }
 
 encode_durasi_belajar = {
-    "< 1 jam": 0,
-    "1-2 jam": 1,
-    "2-3 jam": 2,
-    "3-4 jam": 3,
-    "> 4 jam": 4
+    "< 1 jam": 0, "1-2 jam": 1, "2-3 jam": 2,
+    "3-4 jam": 3, "> 4 jam": 4
 }
 
 encode_jam_belajar = {
-    "05.00-10.59": 0,
-    "11.00-16.59": 1,
-    "17.00-00.59": 2
+    "05.00-10.59": 0, "11.00-16.59": 1, "17.00-00.59": 2
 }
 
 encode_hp = {
-    "< 2 jam": 0,
-    "2-4 jam": 1,
-    "4-6 jam": 2,
-    "> 6 jam": 3
+    "< 2 jam": 0, "2-4 jam": 1, "4-6 jam": 2, "> 6 jam": 3
 }
 
-encode_coffee = {
-    "Tidak": 0,
-    "Ya": 1
-}
+encode_coffee = {"Tidak": 0, "Ya": 1}
 
 # =====================
 # PREDIKSI
@@ -172,12 +161,42 @@ if st.button("🔮 Prediksi Waktu Optimal"):
 
     with torch.no_grad():
         output = model(data_tensor)
-        pred = torch.argmax(output, dim=1).item()
+        probs = F.softmax(output, dim=1)[0].numpy()
+        pred = np.argmax(probs)
 
     label_map = {
-        0: "🌅 Pagi (05.00 - 10.59)",
-        1: "🌤️ Siang (11.00 - 16.59)",
-        2: "🌙 Malam (17.00 - 00.59)"
+        0: "🌅 Pagi (05.00–10.59)",
+        1: "🌤️ Siang (11.00–16.59)",
+        2: "🌙 Malam (17.00–00.59)"
     }
 
-    st.success(f"✅ Waktu optimal belajar Anda adalah: **{label_map[pred]}**")
+    st.success(f"✅ **Waktu optimal belajar Anda:** {label_map[pred]}")
+
+    # =====================
+    # CONFIDENCE
+    # =====================
+    st.subheader("📊 Tingkat Keyakinan Model")
+    labels = ["Pagi", "Siang", "Malam"]
+
+    for i, label in enumerate(labels):
+        st.progress(float(probs[i]))
+        st.write(f"{label}: **{probs[i]*100:.2f}%**")
+
+    # =====================
+    # RINGKASAN INPUT
+    # =====================
+    st.subheader("📋 Ringkasan Data Anda")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.write("🕒 Jam Tidur:", jam_tidur)
+        st.write("😴 Durasi Tidur:", durasi_tidur)
+        st.write("📚 Durasi Belajar:", durasi_belajar)
+        st.write("⏰ Jam Belajar:", jam_belajar)
+        st.write("📱 Durasi HP:", durasi_hp)
+
+    with col2:
+        st.write("☕ Kopi:", coffee)
+        st.write("⚠️ Gangguan:", gangguan)
+        st.write("🙂 Mood:", mood)
+        st.write("🔥 Produktivitas:", produktivitas)
