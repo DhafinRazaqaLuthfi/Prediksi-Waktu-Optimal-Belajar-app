@@ -97,13 +97,12 @@ jam_belajar = st.selectbox(
     ["05.00-10.59", "11.00-16.59", "17.00-00.59"]
 )
 
-gangguan = st.slider("Tingkat Gangguan", 1, 5)
-
 durasi_hp = st.selectbox(
     "Durasi HP / Laptop",
     ["< 2 jam", "2-4 jam", "4-6 jam", "> 6 jam"]
 )
 
+gangguan = st.slider("Tingkat Gangguan", 1, 5)
 coffee = st.selectbox("Konsumsi Kopi", ["Tidak", "Ya"])
 mood = st.slider("Mood", 1, 5)
 produktivitas = st.slider("Produktivitas", 1, 5)
@@ -169,8 +168,7 @@ if st.button("🔮 Prediksi Waktu Optimal"):
     }
 
     st.success(
-        f"✅ **Berdasarkan tingkat keyakinan model, "
-        f"waktu belajar paling optimal adalah:** {label_map[pred]}"
+        f" **Waktu belajar paling optimal adalah:** {label_map[pred]}"
     )
 
     st.subheader("📊 Tingkat Keyakinan Model")
