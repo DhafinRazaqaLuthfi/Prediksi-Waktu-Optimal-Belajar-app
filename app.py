@@ -6,15 +6,42 @@ import torch.nn.functional as F
 import numpy as np
 import joblib
 import os
+from PIL import Image
 
 # =====================
-# KONFIGURASI HALAMAN
+# KONFIGURASI HALAMAN (WAJIB PALING ATAS)
 # =====================
 st.set_page_config(
     page_title="Prediksi Waktu Optimal Belajar",
     page_icon="📊",
     layout="centered"
 )
+
+# =====================
+# HEADER ATAS (LOGO + INFO KELOMPOK)
+# =====================
+logo = Image.open("logo_itera.png")
+
+col1, col2 = st.columns([1, 5])
+
+with col1:
+    st.image(logo, width=90)
+
+with col2:
+    st.markdown(
+        """
+        <div style="font-size:14px; color: gray;">
+            <b>Mata Kuliah:</b> Deep Learning<br>
+            <b>Kelompok 24</b> |
+            Dhafin Razaqa Luthfi |
+            Siti Nur Aarifah |
+            Cyntia Kristina Sidauruk
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+st.divider()
 
 # =====================
 # PATH FILE
@@ -59,10 +86,10 @@ model.eval()
 scaler = joblib.load(SCALER_PATH)
 
 # =====================
-# HEADER
+# JUDUL APLIKASI
 # =====================
 st.title("📊 Prediksi Waktu Optimal Belajar")
-st.write("Aplikasi Deep Learning menggunakan **MLP (PyTorch)**")
+st.write("Aplikasi prediksi waktu belajar optimal berbasis **MLP (PyTorch)**")
 
 st.divider()
 st.subheader("📝 Masukkan Data Kebiasaan Anda")
@@ -96,13 +123,13 @@ durasi_hp = st.selectbox(
 )
 
 coffee = st.selectbox(
-    "Apakah sebelum belajar mengonsumsi minuman kopi?",
+    "Apakah sebelum belajar mengonsumsi kopi?",
     ["Tidak", "Ya"]
 )
 
 gangguan = st.slider("Berapa banyak gangguan saat belajar?", 1, 5)
 mood = st.slider("Seberapa semangat Anda saat belajar?", 1, 5)
-produktivitas = st.slider("Seberapa produktif Anda menilai diri Anda saat belajar?", 1, 5)
+produktivitas = st.slider("Seberapa produktif Anda saat belajar?", 1, 5)
 
 # =====================
 # ENCODING
@@ -181,15 +208,12 @@ if st.button("🔮 Prediksi Waktu Optimal"):
         2: "🌙 Malam (17.00–00.59)"
     }
 
-    st.success(
-        f"✅ **Waktu belajar paling optimal adalah:** {label_map[pred]}"
-    )
+    st.success(f"✅ **Waktu belajar paling optimal:** {label_map[pred]}")
 
     st.subheader("📊 Tingkat Keyakinan Model")
 
-    confidence_labels = ["🌅 Pagi", "🌤️ Siang", "🌙 Malam"]
-
-    for i, label in enumerate(confidence_labels):
+    labels = ["🌅 Pagi", "🌤️ Siang", "🌙 Malam"]
+    for i, label in enumerate(labels):
         if i == pred:
             st.markdown(f"**{label} (PALING OPTIMAL)**")
         else:
@@ -197,20 +221,3 @@ if st.button("🔮 Prediksi Waktu Optimal"):
 
         st.progress(float(probs[i]))
         st.write(f"{probs[i]*100:.2f}%")
-
-# =====================
-# FOOTER (SELALU MUNCUL)
-# =====================
-st.divider()
-
-st.markdown(
-    """
-    <div style="text-align: center; font-size: 14px; color: gray;">
-        <b>Kelompok 24</b><br>
-        Dhafin Razaqa Luthfi<br>
-        Siti Nur Aarifah<br>
-        Cyntia Kristina Sidauruk
-    </div>
-    """,
-    unsafe_allow_html=True
-)
