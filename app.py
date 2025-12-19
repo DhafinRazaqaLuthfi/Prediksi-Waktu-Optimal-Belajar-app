@@ -78,34 +78,34 @@ st.subheader("📝 Masukkan Data Kebiasaan Anda")
 # INPUT USER
 # =====================
 jam_tidur = st.selectbox(
-    "Jam Tidur",
+    "Pada jam berapa Anda biasanya tidur?",
     ["21.00-22.00", "22.01-23.00", "23.01-00.00", "00.01-01.00", "> 01.00"]
 )
 
 durasi_tidur = st.selectbox(
-    "Durasi Tidur",
+    "Berapa lama Anda tidur per hari?",
     ["< 5 jam", "5-6 jam", "6-7 jam", "7-8 jam", "> 8 jam"]
 )
 
 durasi_belajar = st.selectbox(
-    "Durasi Belajar",
+    "Berapa lama Anda belajar per hari (jam)?",
     ["< 1 jam", "1-2 jam", "2-3 jam", "3-4 jam", "> 4 jam"]
 )
 
 jam_belajar = st.selectbox(
-    "Jam Belajar",
+    "Biasanya mulai belajar jam berapa?",
     ["05.00-10.59", "11.00-16.59", "17.00-00.59"]
 )
 
 durasi_hp = st.selectbox(
-    "Durasi HP / Laptop",
+    "Berapa lama Anda menggunakan HP/laptop selain belajar?",
     ["< 2 jam", "2-4 jam", "4-6 jam", "> 6 jam"]
 )
 
-coffee = st.selectbox("Konsumsi Kopi", ["Tidak", "Ya"])
-gangguan = st.slider("Tingkat Gangguan", 1, 5)
-mood = st.slider("Mood", 1, 5)
-produktivitas = st.slider("Produktivitas", 1, 5)
+coffee = st.selectbox("Apakah kamu sebelum belajar konsumsi minuman  Coffee?", ["Tidak", "Ya"])
+gangguan = st.slider("Berapa banyak gangguan saat belajar?", 1, 5)
+mood = st.slider("Seberapa semangat Anda saat belajar?", 1, 5)
+produktivitas = st.slider("Seberapa produktif Anda menilai diri Anda saat belajar?", 1, 5)
 
 # =====================
 # ENCODING
